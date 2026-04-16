@@ -5,9 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "node ../../scripts/run-pnpm-bin.mjs vite bin/vite.js build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "node ../../scripts/run-pnpm-bin.mjs typescript bin/tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
