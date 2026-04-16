@@ -12,11 +12,11 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH ?? "/";
+const basePath = process.env.BASE_PATH ?? "/Smile_Pro/";
 const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:3000";
 
 export default defineConfig({
-  base: "/Smile_Pro/",
+  base: basePath,
   plugins: [
     react(),
     tailwindcss(),
