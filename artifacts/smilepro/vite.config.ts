@@ -16,7 +16,7 @@ const basePath = process.env.BASE_PATH ?? "/";
 const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:3000";
 
 export default defineConfig({
-  base: basePath,
+  base: "/Smile_Pro/",
   plugins: [
     react(),
     tailwindcss(),
