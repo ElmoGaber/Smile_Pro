@@ -1,0 +1,86 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "MaInCA-H47Vva-2fngVE5"
+uri = "file://artifacts/smilepro/src/assets/hero.png"
+type = "image"
+title = "modern dental clinic interior"
+
+[[generated]]
+id = "78nxN7dsLlX856E-dMtiG"
+uri = "file://artifacts/smilepro/src/assets/doctor.png"
+type = "image"
+title = "professional male dentist"
+
+[[generated]]
+id = "adnggLdr-g6F3y-S-7UMj"
+uri = "file://artifacts/smilepro/src/assets/smile.png"
+type = "image"
+title = "beautiful smile teeth"
+
+[[generated]]
+id = "zcTPnV5ChEDcOxZHilGkH"
+uri = "file://artifacts/smilepro/src/assets/lobby.png"
+type = "image"
+title = "clinic lobby waiting area"
+
+[[generated]]
+id = "O1jCujq8gmWV6fjYpIGdy"
+uri = "file://artifacts/smilepro/src/assets/clinic-reception.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "JKpzAdOpUsc3-YNDj0WTR"
+uri = "file://artifacts/smilepro/src/assets/clinic-chair.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "FjNZZ1wNEivvNTk-CrkPE"
+uri = "file://artifacts/smilepro/src/assets/service-whitening.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OV2Z11qllqaH57H5v6hf1"
+uri = "file://artifacts/smilepro/src/assets/service-implants.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "CoPpf_FL_rHXw5J5F90dV"
+uri = "file://artifacts/smilepro/src/assets/service-braces.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0MBr93t34B3V9_Cz26Ok_"
+uri = "file://artifacts/smilepro/src/assets/service-veneers.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "pw5TgICUrO5qbzQ6jOaLR"
+uri = "file://artifacts/smilepro/src/assets/service-xray.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "1KP3WDorphMq5f-gL748L"
+uri = "file://artifacts/smilepro/src/assets/gallery-ba1.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "kP1SnIeIpOS89UcTXk1am"
+uri = "file://artifacts/smilepro/src/assets/gallery-ba2.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "zqEcUiCYDmYS5Kvafiw_o"
+uri = "file://artifacts/smilepro/src/assets/gallery-ba3.png"
+type = "image"
+title = "generated_image"

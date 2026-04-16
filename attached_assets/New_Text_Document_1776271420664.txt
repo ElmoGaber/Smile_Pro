@@ -1,0 +1,304 @@
+عايزك تبني ويبسايت لبرتفوليو لدكتور اسمه احمد طارق و يبقي دكتور اسنان و العيادة اسمها smilepro و عايزك تجعل الويبسات ليها قسم للتسجيل مع الدكتور
+
+You are a world-class team of software architects, AI engineers, mobile engineers, DevOps engineers, UX designers, and product architects.
+
+Your task is to generate a complete production-grade software platform.
+
+The system must be modular, scalable, AI-integrated, cross-platform, and production-ready.
+
+The architecture must automatically include ALL modern technologies and system layers described below.
+
+---
+
+CORE SYSTEM PRINCIPLES
+
+The system must be:
+
+• Full-stack
+• AI-integrated
+• mobile-first
+• real-time capable
+• modular
+• scalable
+• bilingual (Arabic + English)
+• dark/light theme supported
+• accessible (font resize)
+• cloud deployable
+• PWA installable
+
+---
+
+PLATFORM SUPPORT
+
+The application must support:
+
+• Web Application
+• Mobile Application
+• Progressive Web App
+• Admin Dashboard
+• Public User Interface
+
+---
+
+FRONTEND TECHNOLOGY
+
+React
+TypeScript
+Vite
+TailwindCSS
+Radix UI
+Framer Motion
+Recharts
+Three.js
+React Three Fiber
+Drei
+i18next
+TanStack Query
+Zustand
+React Router / Wouter
+
+---
+
+MOBILE TECHNOLOGY
+
+React Native
+Expo SDK
+Expo Router
+Expo Web
+Expo Notifications
+Expo Haptics
+Expo Image
+Expo Blur
+Expo Linear Gradient
+React Native SVG
+React Native Reanimated
+Gesture Handler
+AsyncStorage
+
+---
+
+BACKEND TECHNOLOGY
+
+FastAPI
+Express
+NodeJS
+Python
+REST APIs
+Socket.IO
+
+---
+
+DATABASE SYSTEM
+
+PostgreSQL
+MongoDB
+SQLite
+Vector Database (ChromaDB)
+
+ORM Support:
+Drizzle ORM
+SQLAlchemy
+Motor / PyMongo
+
+---
+
+REALTIME SYSTEM
+
+WebSocket / Socket.IO
+
+Supports:
+
+• real-time data streaming
+• live dashboards
+• alerts
+• monitoring
+
+---
+
+AI SYSTEM ARCHITECTURE
+
+Multi-Agent AI system
+
+Includes:
+
+• LangChain
+• LangGraph
+• Retrieval Augmented Generation
+• Vector embeddings
+• ChromaDB
+• BM25 retrieval
+• Tool calling
+• Contextual prompt routing
+
+Agents:
+
+• clinical agent
+• nutrition agent
+• exercise agent
+• risk analysis agent
+• coaching agent
+
+---
+
+DIGITAL TWIN SYSTEM
+
+3D health visualization
+
+Uses:
+
+Three.js
+WebGL
+
+Supports:
+
+• body health overlay
+• VR health twin
+• holographic interface
+
+---
+
+SMART HEALTH TOOLS
+
+• symptom checker
+• drug interaction checker
+• BMI calculator
+• health report generator
+• AI health assistant
+• predictive health insights
+
+---
+
+NUTRITION INTELLIGENCE
+
+Food nutrition database
+
+Features:
+
+• macro calculation
+• calorie estimation
+• meal planning
+• nutrition analytics
+
+---
+
+FITNESS INTELLIGENCE
+
+• exercise planning
+• pose tracking
+• form analysis
+• workout analytics
+
+---
+
+HEALTH MONITORING
+
+Tracks:
+
+• blood pressure
+• glucose
+• heart rate
+• temperature
+• sleep
+• activity
+
+Provides:
+
+• trend charts
+• anomaly detection
+• predictive risk scores
+
+---
+
+COACHING SYSTEM
+
+• consultation booking
+• coaching sessions
+• coaching chat
+• feedback system
+
+---
+
+NOTIFICATION SYSTEM
+
+Multi-channel reminders:
+
+• medication reminders
+• meal reminders
+• refill alerts
+• emergency alerts
+
+Uses:
+
+• push notifications
+• scheduled notifications
+• Android channels
+• service worker notifications
+
+---
+
+PWA FEATURES
+
+• installable app
+• offline support
+• caching
+• service worker
+• manifest
+
+---
+
+DATASETS
+
+System must support datasets:
+
+• food nutrition dataset
+• drug interaction dataset
+• exercise dataset
+• vital health dataset
+
+---
+
+EXPORT SYSTEM
+
+Users can export data as:
+
+• PDF
+• CSV
+• JSON
+
+---
+
+UX FEATURES
+
+• Dark / Light theme toggle
+• Arabic / English switch
+• RTL / LTR layout
+• Font size control
+• floating AI chatbot
+• complaint phone number
+• admin panel
+• public pages
+
+---
+
+DEVOPS
+
+Docker
+CI/CD
+Environment configs
+Cloud deployment
+
+---
+
+OUTPUT REQUIREMENTS
+
+Generate:
+
+1️⃣ Full system architecture
+2️⃣ folder structure
+3️⃣ frontend code scaffolding
+4️⃣ backend API architecture
+5️⃣ database schema
+6️⃣ AI architecture
+7️⃣ deployment setup
+
+The system must be modular so that only the project topic changes while the platform remains reusable.

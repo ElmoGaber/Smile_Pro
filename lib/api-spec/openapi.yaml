@@ -1,0 +1,286 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: SmilePro Dental Clinic API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: appointments
+    description: Appointment operations
+  - name: services
+    description: Clinic services
+  - name: stats
+    description: Clinic statistics
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /appointments:
+    get:
+      operationId: listAppointments
+      tags: [appointments]
+      summary: List all appointments
+      responses:
+        "200":
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Appointment"
+    post:
+      operationId: createAppointment
+      tags: [appointments]
+      summary: Book a new appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentBody"
+      responses:
+        "201":
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+
+  /appointments/{id}:
+    get:
+      operationId: getAppointment
+      tags: [appointments]
+      summary: Get appointment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateAppointmentStatus
+      tags: [appointments]
+      summary: Update appointment status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentStatusBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List dental services offered
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DentalService"
+
+  /stats/overview:
+    get:
+      operationId: getClinicStats
+      tags: [stats]
+      summary: Get clinic overview statistics
+      responses:
+        "200":
+          description: Clinic stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClinicStats"
+
+  /appointments/upcoming:
+    get:
+      operationId: listUpcomingAppointments
+      tags: [appointments]
+      summary: List upcoming confirmed appointments
+      responses:
+        "200":
+          description: Upcoming appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Appointment"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientName:
+          type: string
+        patientPhone:
+          type: string
+        patientEmail:
+          type: string
+          nullable: true
+        service:
+          type: string
+        preferredDate:
+          type: string
+        preferredTime:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+        createdAt:
+          type: string
+      required:
+        - id
+        - patientName
+        - patientPhone
+        - service
+        - preferredDate
+        - preferredTime
+        - status
+        - createdAt
+
+    CreateAppointmentBody:
+      type: object
+      properties:
+        patientName:
+          type: string
+        patientPhone:
+          type: string
+        patientEmail:
+          type: string
+          nullable: true
+        service:
+          type: string
+        preferredDate:
+          type: string
+        preferredTime:
+          type: string
+        notes:
+          type: string
+          nullable: true
+      required:
+        - patientName
+        - patientPhone
+        - service
+        - preferredDate
+        - preferredTime
+
+    UpdateAppointmentStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+      required:
+        - status
+
+    DentalService:
+      type: object
+      properties:
+        id:
+          type: integer
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        descriptionEn:
+          type: string
+        descriptionAr:
+          type: string
+        duration:
+          type: integer
+          description: Duration in minutes
+        icon:
+          type: string
+      required:
+        - id
+        - nameEn
+        - nameAr
+        - descriptionEn
+        - descriptionAr
+        - duration
+        - icon
+
+    ClinicStats:
+      type: object
+      properties:
+        totalAppointments:
+          type: integer
+        pendingAppointments:
+          type: integer
+        confirmedAppointments:
+          type: integer
+        completedAppointments:
+          type: integer
+        todayAppointments:
+          type: integer
+        happyPatients:
+          type: integer
+        yearsExperience:
+          type: integer
+      required:
+        - totalAppointments
+        - pendingAppointments
+        - confirmedAppointments
+        - completedAppointments
+        - todayAppointments
+        - happyPatients
+        - yearsExperience
