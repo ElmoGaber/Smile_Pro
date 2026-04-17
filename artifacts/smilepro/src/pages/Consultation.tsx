@@ -12,13 +12,56 @@ interface Message {
 }
 
 const WORKING_HOURS = [
-  { dayAr: "السبت", dayEn: "Saturday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الأحد", dayEn: "Sunday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الاثنين", dayEn: "Monday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الثلاثاء", dayEn: "Tuesday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الأربعاء", dayEn: "Wednesday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الخميس", dayEn: "Thursday", open: "10:00 ص", close: "10:00 م", isOpen: true },
-  { dayAr: "الجمعة", dayEn: "Friday", open: "—", close: "—", isOpen: false },
+  { dayAr: "السبت", dayEn: "Saturday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الأحد", dayEn: "Sunday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الاثنين", dayEn: "Monday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الثلاثاء", dayEn: "Tuesday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الأربعاء", dayEn: "Wednesday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الخميس", dayEn: "Thursday", open: "5:00 م", close: "11:00 م", isOpen: true },
+  { dayAr: "الجمعة", dayEn: "Friday", open: "5:00 م", close: "11:00 م", isOpen: true },
+];
+
+const SUGGESTED_QUESTIONS = [
+  {
+    ar: "ألم الضرس عندي يزيد في الليل، أعمل إيه؟",
+    en: "My toothache gets worse at night. What should I do?",
+  },
+  {
+    ar: "ما هي التفاعلات الدوائية للأموكسيسيلين؟",
+    en: "What are amoxicillin drug interactions?",
+  },
+  {
+    ar: "متى أحتاج إلى علاج العصب؟",
+    en: "When do I need a root canal treatment?",
+  },
+  {
+    ar: "بعد خلع الضرس، ما الأكل المسموح؟",
+    en: "What can I eat after a tooth extraction?",
+  },
+  {
+    ar: "هل ينفع أركب تقويم مع وجود التهاب لثة؟",
+    en: "Can I start braces while I have gum inflammation?",
+  },
+  {
+    ar: "هل زراعة الأسنان مؤلمة؟",
+    en: "Are dental implants painful?",
+  },
+  {
+    ar: "ما الفرق بين التلبيس والقشور؟",
+    en: "What is the difference between crowns and veneers?",
+  },
+  {
+    ar: "إزاي أحافظ على النتيجة بعد التبييض؟",
+    en: "How can I maintain results after whitening?",
+  },
+  {
+    ar: "هل الإيبوبروفين مناسب لمرضى الضغط؟",
+    en: "Is ibuprofen suitable for hypertension patients?",
+  },
+  {
+    ar: "عايز أعرف أنسب خدمة لحالتي من صور الأشعة.",
+    en: "I want to know the best service for my case based on x-rays.",
+  },
 ];
 
 const DRUG_INTERACTIONS = [
@@ -67,7 +110,7 @@ export default function Consultation() {
   const today = new Date();
   const todayDay = today.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
   // Map JS day to our array: Sat=0, Sun=1, Mon=2, Tue=3, Wed=4, Thu=5, Fri=6
-  const dayIndex = todayDay === 0 ? 1 : todayDay === 6 ? 0 : todayDay;
+  const dayIndex = (todayDay + 1) % 7;
   const todaySchedule = WORKING_HOURS[dayIndex];
 
   useEffect(() => {
@@ -86,6 +129,10 @@ export default function Consultation() {
     const assistantMsg: Message = { role: "assistant", content: "" };
     setMessages([...newMessages, assistantMsg]);
 
+    const unsupportedReply = isAr
+      ? "لا أقدر على الإجابة على هذا السؤال حالياً لأنه خارج نطاق مساعد العيادة أو غير متاح عبر نظام الذكاء الاصطناعي. الأفضل حجز جلسة مع الدكتور أحمد طارق."
+      : "I can't answer this question right now because it is outside the clinic assistant scope or unavailable through the AI system. The best option is to book a session with Dr. Ahmed Tarek.";
+
     try {
       const resp = await fetch(`/api/ai-chat`, {
         method: "POST",
@@ -99,6 +146,7 @@ export default function Consultation() {
       const reader = resp.body?.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      let receivedError = false;
 
       while (reader) {
         const { done, value } = await reader.read();
@@ -110,17 +158,28 @@ export default function Consultation() {
           if (!line.startsWith("data: ")) continue;
           try {
             const data = JSON.parse(line.slice(6));
+            if (data.error) {
+              assistantMsg.content = unsupportedReply;
+              setMessages([...newMessages, { ...assistantMsg }]);
+              receivedError = true;
+              break;
+            }
             if (data.content) {
               assistantMsg.content += data.content;
               setMessages([...newMessages, { ...assistantMsg }]);
             }
           } catch {}
         }
+
+        if (receivedError) break;
+      }
+
+      if (!assistantMsg.content.trim()) {
+        assistantMsg.content = unsupportedReply;
+        setMessages([...newMessages, { ...assistantMsg }]);
       }
     } catch {
-      assistantMsg.content = isAr
-        ? "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى."
-        : "Sorry, a connection error occurred. Please try again.";
+      assistantMsg.content = unsupportedReply;
       setMessages([...newMessages, { ...assistantMsg }]);
     }
 
@@ -185,17 +244,13 @@ export default function Consultation() {
                         : "Hello! Ask me anything about dental care or medications"}
                     </p>
                     <div className="flex flex-wrap gap-2 mt-4 justify-center">
-                      {[
-                        isAr ? "ما هي التفاعلات الدوائية للأموكسيسيلين؟" : "What are amoxicillin drug interactions?",
-                        isAr ? "متى أحتاج إلى تلبيس الأسنان؟" : "When do I need a crown?",
-                        isAr ? "كيف أعتني بأسناني بعد التنظيف؟" : "How to care for teeth after cleaning?",
-                      ].map((q, i) => (
+                      {SUGGESTED_QUESTIONS.map((q, i) => (
                         <button
                           key={i}
-                          onClick={() => setInput(q)}
+                          onClick={() => setInput(isAr ? q.ar : q.en)}
                           className="text-xs bg-muted hover:bg-muted/80 border border-border rounded-full px-3 py-1.5 transition-colors"
                         >
-                          {q}
+                          {isAr ? q.ar : q.en}
                         </button>
                       ))}
                     </div>
@@ -294,10 +349,16 @@ export default function Consultation() {
                   ✓ {isAr ? "العيادة مفتوحة الآن" : "Clinic is open now"}
                 </div>
               )}
-              <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
-                <FaWhatsapp className="h-4 w-4" />
-                {isAr ? "احجز على واتساب 01095530001" : "Book via WhatsApp 01095530001"}
-              </a>
+              <div className="mt-4 space-y-2">
+                <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
+                  <FaWhatsapp className="h-4 w-4" />
+                  {isAr ? "احجز على واتساب 01095530001" : "Book via WhatsApp 01095530001"}
+                </a>
+                <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
+                  <FaWhatsapp className="h-4 w-4" />
+                  {isAr ? "احجز على واتساب 01067678454" : "Book via WhatsApp 01067678454"}
+                </a>
+              </div>
             </div>
 
             {/* Contact quick */}
@@ -308,7 +369,7 @@ export default function Consultation() {
               </h3>
               <div dir="ltr" className="space-y-1 text-center">
                 <a href="tel:+201095530001" className="block text-primary font-bold text-lg hover:underline">01095530001</a>
-                <a href="tel:+201067678454" className="block text-primary font-bold text-lg hover:underline">+20 10 67678454</a>
+                <a href="tel:+201067678454" className="block text-primary font-bold text-lg hover:underline">01067678454</a>
               </div>
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />

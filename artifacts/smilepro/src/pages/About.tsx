@@ -112,7 +112,7 @@ export default function About() {
                   <div dir="ltr" className="flex flex-wrap items-center gap-2">
                     <a href="tel:+201095530001" className="hover:text-primary">01095530001</a>
                     <span className="text-muted-foreground/60">/</span>
-                    <a href="tel:+201067678454" className="hover:text-primary">+20 10 67678454</a>
+                    <a href="tel:+201067678454" className="hover:text-primary">01067678454</a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -133,6 +133,12 @@ export default function About() {
                   <Button variant="outline" size="lg" className="rounded-full px-8 gap-2">
                     <FaWhatsapp className="h-4 w-4 text-[#25D366]" />
                     WhatsApp 01095530001
+                  </Button>
+                </a>
+                <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="lg" className="rounded-full px-8 gap-2">
+                    <FaWhatsapp className="h-4 w-4 text-[#25D366]" />
+                    WhatsApp 01067678454
                   </Button>
                 </a>
               </div>

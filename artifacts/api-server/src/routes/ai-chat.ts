@@ -2,6 +2,60 @@ import { Router } from "express";
 
 const router = Router();
 
+const OUT_OF_SCOPE_REPLY =
+  "لا أقدر على الإجابة على هذا السؤال حالياً لأنه خارج نطاق مساعد العيادة أو غير متاح عبر نظام الذكاء الاصطناعي. الأفضل حجز جلسة مع الدكتور أحمد طارق.";
+
+const DENTAL_SCOPE_KEYWORDS = [
+  "سن",
+  "اسنان",
+  "أسنان",
+  "ضرس",
+  "لثة",
+  "فك",
+  "ابتسامة",
+  "تقويم",
+  "زراعة",
+  "تبييض",
+  "خلع",
+  "حشو",
+  "حشوة",
+  "عصب",
+  "تركيبة",
+  "تركيبات",
+  "قشور",
+  "فينير",
+  "veneer",
+  "dental",
+  "dentist",
+  "tooth",
+  "teeth",
+  "gum",
+  "root canal",
+  "implant",
+  "braces",
+  "whitening",
+  "clinic",
+  "appointment",
+  "عيادة",
+  "دكتور",
+  "طبيب",
+  "موعد",
+  "مواعيد",
+  "حجز",
+  "سمايل برو",
+  "دواء",
+  "أموكسيسيلين",
+  "ايبوبروفين",
+  "ibuprofen",
+  "amoxicillin",
+  "warfarin",
+];
+
+function isInDentalScope(message: string) {
+  const normalized = message.toLowerCase();
+  return DENTAL_SCOPE_KEYWORDS.some((keyword) => normalized.includes(keyword.toLowerCase()));
+}
+
 let openaiClientPromise: Promise<unknown> | null = null;
 
 async function getOpenAIClient() {
@@ -61,11 +115,14 @@ const SYSTEM_PROMPT = `أنت مساعد ذكاء اصطناعي متخصص في
 3. للحوامل: استشيري الطبيب قبل أي دواء
 4. للمرضى المزمنين (سكري، قلب، كلى): أخبر الطبيب دائماً
 
-ساعات العمل: السبت - الخميس: 10 صباحاً - 10 مساءً | الجمعة: مغلق
+ساعات العمل: يومياً من 5 مساءً إلى 11 مساءً
 العنوان: دمياط الجديدة - تقاطع شارع البشبيشي مع شارع ابو الخير - أعلى ماركت كازيون
-هاتف: 01095530001 / +20 10 67678454
+هاتف: 01095530001 / 01067678454
+واتساب: 01095530001 / 01067678454
 
-أجب دائماً باللغة العربية بشكل ودي ومهني. إذا كان الأمر خطيراً، اطلب من المريض الاتصال بالعيادة فوراً. لا تشخص أمراضاً ولكن قدم معلومات عامة مفيدة وانصح دائماً بزيارة الطبيب.`;
+أجب دائماً باللغة العربية بشكل ودي ومهني. إذا كان الأمر خطيراً، اطلب من المريض الاتصال بالعيادة فوراً. لا تشخص أمراضاً ولكن قدم معلومات عامة مفيدة وانصح دائماً بزيارة الطبيب.
+إذا كان السؤال خارج نطاق طب الأسنان أو خارج معلومات العيادة أو ليس لديك معلومة موثوقة، يجب أن ترد بالنص التالي حرفياً:
+"لا أقدر على الإجابة على هذا السؤال حالياً لأنه خارج نطاق مساعد العيادة أو غير متاح عبر نظام الذكاء الاصطناعي. الأفضل حجز جلسة مع الدكتور أحمد طارق."`;
 
 router.post("/", async (req, res) => {
   try {
@@ -74,13 +131,23 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
+    if (!isInDentalScope(message)) {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(`data: ${JSON.stringify({ content: OUT_OF_SCOPE_REPLY })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+      return;
+    }
+
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
     const openai = await getOpenAIClient();
     if (!openai) {
-      res.write(`data: ${JSON.stringify({ error: "AI service unavailable" })}\n\n`);
+      res.write(`data: ${JSON.stringify({ content: OUT_OF_SCOPE_REPLY })}\n\n`);
       res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
       res.end();
       return;
@@ -113,7 +180,8 @@ router.post("/", async (req, res) => {
     res.end();
   } catch (err) {
     req.log.error({ err }, "AI chat error");
-    res.write(`data: ${JSON.stringify({ error: "AI service unavailable" })}\n\n`);
+    res.write(`data: ${JSON.stringify({ content: OUT_OF_SCOPE_REPLY })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
   }
 });

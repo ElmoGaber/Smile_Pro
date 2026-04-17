@@ -36,6 +36,10 @@ export function Footer() {
                 className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-colors">
                 <FaWhatsapp className="h-4 w-4" />
               </a>
+              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01067678454" title="WhatsApp 01067678454"
+                className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-colors">
+                <FaWhatsapp className="h-4 w-4" />
+              </a>
             </div>
           </div>
           
@@ -61,12 +65,15 @@ export function Footer() {
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
                 <div dir="ltr" className="flex flex-col">
                   <a href="tel:+201095530001" className="hover:text-primary transition-colors">01095530001</a>
-                  <a href="tel:+201067678454" className="hover:text-primary transition-colors">+20 10 67678454</a>
+                  <a href="tel:+201067678454" className="hover:text-primary transition-colors">01067678454</a>
                 </div>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-start gap-2">
                 <FaWhatsapp className="h-4 w-4 shrink-0 text-[#25D366]" />
-                <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" dir="ltr" className="hover:text-primary transition-colors">01095530001</a>
+                <div dir="ltr" className="flex flex-col">
+                  <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">01095530001</a>
+                  <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">01067678454</a>
+                </div>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
