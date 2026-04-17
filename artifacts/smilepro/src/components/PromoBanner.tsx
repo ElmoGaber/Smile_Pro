@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { toApiUrl } from "@/lib/api-base";
 import { X } from "lucide-react";
 import { useLocation } from "wouter";
+import { toApiUrl } from "@/lib/api-base";
 
 interface Promotion {
   id: number;

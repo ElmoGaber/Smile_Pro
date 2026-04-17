@@ -3,9 +3,9 @@ import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { toApiUrl } from "@/lib/api-base";
 import { Send, Bot, User, AlertTriangle, Clock, Pill, ChevronDown, ChevronUp, MapPin, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { toApiUrl } from "@/lib/api-base";
 
 interface Message {
   role: "user" | "assistant";

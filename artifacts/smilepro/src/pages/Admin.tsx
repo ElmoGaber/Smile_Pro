@@ -21,9 +21,9 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { toApiUrl } from "@/lib/api-base";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { toApiUrl } from "@/lib/api-base";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
@@ -231,9 +231,11 @@ export default function Admin({ onLogout }: AdminProps) {
   async function savePromo() {
     setIsSavingPromo(true);
     try {
-      const url = editingId ? `/api/promotions/${editingId}` : "/api/promotions";
+      const url = editingId
+        ? toApiUrl(`/api/promotions/${editingId}`)
+        : toApiUrl("/api/promotions");
       const method = editingId ? "PUT" : "POST";
-      const res = await fetch(toApiUrl(url), {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(promoForm),
