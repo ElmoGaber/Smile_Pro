@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { toApiUrl } from "@/lib/api-base";
 import { Send, Bot, User, AlertTriangle, Clock, Pill, ChevronDown, ChevronUp, MapPin, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -134,7 +135,7 @@ export default function Consultation() {
       : "I can't answer this question right now because it is outside the clinic assistant scope or unavailable through the AI system. The best option is to book a session with Dr. Ahmed Tarek.";
 
     try {
-      const resp = await fetch(`/api/ai-chat`, {
+      const resp = await fetch(toApiUrl("/api/ai-chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

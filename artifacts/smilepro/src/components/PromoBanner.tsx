@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
+import { toApiUrl } from "@/lib/api-base";
 import { X } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -23,7 +24,7 @@ export function PromoBanner() {
 
   const loadPromotions = useCallback(async () => {
     try {
-      const res = await fetch(`/api/promotions/active`);
+      const res = await fetch(toApiUrl("/api/promotions/active"));
       const payload = await res.json().catch(() => null);
 
       if (!res.ok || !Array.isArray(payload)) {

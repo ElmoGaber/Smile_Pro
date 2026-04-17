@@ -57,19 +57,17 @@ const TIME_SLOTS = [
 
 export default function Book() {
   const { t, lang } = useI18n();
+  const isAr = lang === "ar";
   const { toast } = useToast();
   const { data: services } = useListServices();
   const createAppointment = useCreateAppointment();
   const safeServices: ServiceOption[] =
     Array.isArray(services) && services.length > 0
-      ? services.filter(
-          (item): item is ServiceOption =>
-            Boolean(item) &&
-            typeof item === "object" &&
-            typeof (item as ServiceOption).id === "number" &&
-            typeof (item as ServiceOption).nameEn === "string" &&
-            typeof (item as ServiceOption).nameAr === "string",
-        )
+      ? services.map((service) => ({
+          id: service.id,
+          nameEn: service.nameEn,
+          nameAr: service.nameAr,
+        }))
       : FALLBACK_SERVICES;
 
   const form = useForm<FormValues>({
@@ -102,17 +100,17 @@ export default function Book() {
           });
           form.reset();
         },
-        onError: () => {
+        onError: (error) => {
+          const description = error instanceof Error ? error.message : undefined;
           toast({
-            title: t("error"),
+            title: isAr ? "تعذر إرسال طلب الحجز" : "Failed to submit booking request",
+            description,
             variant: "destructive",
           });
-        }
+        },
       }
     );
   };
-
-  const isAr = lang === "ar";
 
   return (
     <div className="w-full">

@@ -3,7 +3,8 @@ import {
   useListAppointments,
   useGetClinicStats,
   useUpdateAppointmentStatus,
-  getListAppointmentsQueryKey
+  getListAppointmentsQueryKey,
+  type UpdateAppointmentStatusBodyStatus,
 } from "@workspace/api-client-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { UpdateAppointmentStatusBodyStatus } from "@workspace/api-zod/src/generated/types";
+import { toApiUrl } from "@/lib/api-base";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
@@ -173,7 +174,7 @@ export default function Admin({ onLogout }: AdminProps) {
     if (activeTab === "analytics") {
       void (async () => {
         try {
-          const res = await fetch(`/api/analytics/appointments`);
+          const res = await fetch(toApiUrl("/api/analytics/appointments"));
           const payload = await res.json().catch(() => null);
 
           if (!res.ok) {
@@ -203,7 +204,7 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function loadPromotions() {
     try {
-      const res = await fetch(`/api/promotions`);
+      const res = await fetch(toApiUrl("/api/promotions"));
 
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
@@ -230,9 +231,9 @@ export default function Admin({ onLogout }: AdminProps) {
   async function savePromo() {
     setIsSavingPromo(true);
     try {
-      const url = editingId ? `/api/promotions/${editingId}` : `/api/promotions`;
+      const url = editingId ? `/api/promotions/${editingId}` : "/api/promotions";
       const method = editingId ? "PUT" : "POST";
-      const res = await fetch(url, {
+      const res = await fetch(toApiUrl(url), {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(promoForm),
@@ -262,7 +263,7 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function deletePromo(id: number) {
     try {
-      const res = await fetch(`/api/promotions/${id}`, { method: "DELETE" });
+      const res = await fetch(toApiUrl(`/api/promotions/${id}`), { method: "DELETE" });
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
         const reason = getApiErrorMessage(payload);
@@ -283,7 +284,7 @@ export default function Admin({ onLogout }: AdminProps) {
   async function togglePromo(p: Promo) {
     if (!p.id) return;
     try {
-      const res = await fetch(`/api/promotions/${p.id}`, {
+      const res = await fetch(toApiUrl(`/api/promotions/${p.id}`), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...p, isActive: !p.isActive }),
