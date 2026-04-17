@@ -306,7 +306,10 @@ export default function Consultation() {
                 <Phone className="h-4 w-4 text-primary" />
                 {isAr ? "تواصل سريع" : "Quick Contact"}
               </h3>
-              <a href="tel:01095530001" dir="ltr" className="block text-primary font-bold text-lg hover:underline text-center">01095530001</a>
+              <div dir="ltr" className="space-y-1 text-center">
+                <a href="tel:+201095530001" className="block text-primary font-bold text-lg hover:underline">01095530001</a>
+                <a href="tel:+201067678454" className="block text-primary font-bold text-lg hover:underline">+20 10 67678454</a>
+              </div>
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
                 <span>{isAr ? "دمياط الجديدة — تقاطع شارع البشبيشي مع شارع ابو الخير — أعلى ماركت كازيون" : "New Damietta — Intersection of El-Beshbishi St. and Abu El-Kheir St. — Above Kazyon Market"}</span>

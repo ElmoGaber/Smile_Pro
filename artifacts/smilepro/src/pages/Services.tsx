@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import beforeAfterSmile from "@/assets/before-after-smile.png";
 import {
   ChevronDown, ChevronUp, Sparkles, ShieldCheck, Activity, Star,
   Heart, Droplets, Syringe, Zap, Clock
@@ -406,6 +407,63 @@ export default function Services() {
                 ? "نقدم طيفاً واسعاً من خدمات طب الأسنان المتكاملة بأحدث التقنيات وأعلى معايير الجودة"
                 : "We offer a wide range of integrated dental services with the latest technology and highest quality standards"}
             </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Smile Transformation Highlight */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch"
+          >
+            <div className="relative rounded-3xl overflow-hidden border border-border shadow-sm min-h-[320px]">
+              <img
+                src={beforeAfterSmile}
+                alt={isAr ? "نتيجة قبل وبعد لتجميل الأسنان" : "Before and after smile enhancement result"}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-semibold">
+                <span className="px-3 py-1 rounded-full bg-black/45 backdrop-blur-sm">
+                  {isAr ? "قبل" : "Before"}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-primary/90 text-primary-foreground">
+                  {isAr ? "بعد" : "After"}
+                </span>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-card p-6 md:p-8 flex flex-col justify-center">
+              <span className="inline-flex w-fit items-center gap-2 bg-primary/10 text-primary text-xs font-semibold px-3 py-1.5 rounded-full border border-primary/20 mb-4">
+                <Sparkles className="h-3.5 w-3.5" />
+                {isAr ? "نتائج جمالية واضحة" : "Visible Aesthetic Results"}
+              </span>
+              <h2 className="text-2xl md:text-3xl font-extrabold leading-tight mb-3">
+                {isAr ? "ابتسامة أنظف وأكثر إشراقاً من أول جلسات العلاج" : "A cleaner, brighter smile from the first treatment sessions"}
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-6">
+                {isAr
+                  ? "نصمم خطة علاج مخصصة لحالتك تشمل التقييم الدقيق، خيارات التجميل المناسبة، ومتابعة مستمرة للوصول لنتيجة طبيعية تدوم."
+                  : "We build a personalized treatment plan with precise assessment, suitable cosmetic options, and continuous follow-up for natural, long-lasting results."}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/book">
+                  <Button className="rounded-full px-7">
+                    {isAr ? "احجز تقييم ابتسامتك" : "Book Your Smile Assessment"}
+                  </Button>
+                </Link>
+                <Link href="/consultation">
+                  <Button variant="outline" className="rounded-full px-7">
+                    {isAr ? "اسأل عن الأنسب لك" : "Ask for Your Best Option"}
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

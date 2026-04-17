@@ -109,7 +109,11 @@ export default function About() {
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4 text-primary shrink-0" />
-                  <a href="tel:+201095530001" dir="ltr" className="hover:text-primary">01095530001</a>
+                  <div dir="ltr" className="flex flex-wrap items-center gap-2">
+                    <a href="tel:+201095530001" className="hover:text-primary">01095530001</a>
+                    <span className="text-muted-foreground/60">/</span>
+                    <a href="tel:+201067678454" className="hover:text-primary">+20 10 67678454</a>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Mail className="h-4 w-4 text-primary shrink-0" />

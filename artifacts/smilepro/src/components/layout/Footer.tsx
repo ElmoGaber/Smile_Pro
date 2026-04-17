@@ -57,9 +57,12 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">{t("footer.contact")}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
+              <li className="flex items-start gap-2">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
-                <a href="tel:+201095530001" dir="ltr" className="hover:text-primary transition-colors">01095530001</a>
+                <div dir="ltr" className="flex flex-col">
+                  <a href="tel:+201095530001" className="hover:text-primary transition-colors">01095530001</a>
+                  <a href="tel:+201067678454" className="hover:text-primary transition-colors">+20 10 67678454</a>
+                </div>
               </li>
               <li className="flex items-center gap-2">
                 <FaWhatsapp className="h-4 w-4 shrink-0 text-[#25D366]" />
