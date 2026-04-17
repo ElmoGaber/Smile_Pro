@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import beforeAfterSmile from "@/assets/before-after-smile.png";
+import beforeAfterSmile from "@assets/WhatsApp Image 2026-04-17 at 1.57.17 AM.jpeg";
 import {
   ChevronDown, ChevronUp, Sparkles, ShieldCheck, Activity, Star,
   Heart, Droplets, Syringe, Zap, Clock
