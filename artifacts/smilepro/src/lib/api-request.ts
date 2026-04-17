@@ -6,6 +6,8 @@ const LOCAL_API_BASES = [
   "http://0.0.0.0:8081",
 ];
 
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+
 type ApiRequestResult<T> = {
   response: Response;
   data: T;
@@ -41,12 +43,21 @@ function normalizeApiPath(path: string): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
+function shouldTryLocalFallback(): boolean {
+  if (typeof window === "undefined") return true;
+  return LOCAL_HOSTS.has(window.location.hostname.toLowerCase());
+}
+
 function buildCandidateUrls(path: string): string[] {
   const normalizedPath = normalizeApiPath(path);
+  const localCandidates = shouldTryLocalFallback()
+    ? LOCAL_API_BASES.map((base) => `${base}${normalizedPath}`)
+    : [];
+
   const candidates = [
     toApiUrl(normalizedPath),
     normalizedPath,
-    ...LOCAL_API_BASES.map((base) => `${base}${normalizedPath}`),
+    ...localCandidates,
   ];
 
   const seen = new Set<string>();

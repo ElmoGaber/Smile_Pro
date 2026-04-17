@@ -38,7 +38,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate API URL secret
+        run: |
+          if [ -z "${VITE_API_BASE_URL}" ]; then
+            echo "::warning::VITE_API_BASE_URL secret is not set. Deployed frontend will not be able to reach API on GitHub Pages."
+          fi
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
       - name: Build smilepro frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: pnpm --filter @workspace/smilepro run build
 
       - name: Setup Pages
