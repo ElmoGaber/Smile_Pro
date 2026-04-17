@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot, User, AlertTriangle, Clock, Pill, ChevronDown, ChevronUp, MapPin, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { toApiUrl } from "@/lib/api-base";
 
 interface Message {
   role: "user" | "assistant";
@@ -99,6 +98,52 @@ const DRUG_INTERACTIONS = [
   },
 ];
 
+function buildDrugInteractionSummary(isAr: boolean): string {
+  const lines = DRUG_INTERACTIONS.slice(0, 3).map((entry) => {
+    const interactions = entry.interactions
+      .slice(0, 2)
+      .map((item) => (isAr ? `${item.with}: ${item.effect}` : `${item.with}: ${item.effect}`))
+      .join(isAr ? "، " : ", ");
+    return `${entry.drug} — ${interactions}`;
+  });
+
+  if (isAr) {
+    return `أهم التداخلات الدوائية الشائعة:\n- ${lines.join("\n- ")}\n\nهذه معلومات إرشادية وليست بديلاً عن الكشف الطبي.`;
+  }
+
+  return `Common medication interactions:\n- ${lines.join("\n- ")}\n\nThis is general guidance and does not replace medical diagnosis.`;
+}
+
+function buildLocalConsultationReply(message: string, isAr: boolean): string {
+  const text = message.toLowerCase();
+
+  if (text.includes("دوائي") || text.includes("تداخل") || text.includes("amoxicillin") || text.includes("ibuprofen") || text.includes("drug")) {
+    return buildDrugInteractionSummary(isAr);
+  }
+
+  if (text.includes("عصب") || text.includes("root canal")) {
+    return isAr
+      ? "عادة نحتاج علاج العصب عند وجود ألم شديد مستمر، حساسية طويلة للبارد/الساخن، أو التهاب حول الجذر. يلزم أشعة وفحص سريري لتأكيد الحالة."
+      : "A root canal is usually needed with persistent severe pain, prolonged hot/cold sensitivity, or infection around the root. Clinical exam and x-ray are required to confirm.";
+  }
+
+  if (text.includes("خلع") || text.includes("extraction")) {
+    return isAr
+      ? "بعد الخلع: التزم بالأطعمة اللينة والباردة أول 24 ساعة، وتجنب المضمضة العنيفة والمشروبات الساخنة والتدخين. راجع العيادة فوراً إذا زاد النزيف أو الألم."
+      : "After extraction: choose soft/cold food for 24 hours, avoid vigorous rinsing, hot drinks, and smoking. Contact the clinic if bleeding or pain increases.";
+  }
+
+  if (text.includes("تقويم") || text.includes("braces")) {
+    return isAr
+      ? "يمكن بدء التقويم بعد تقييم اللثة أولاً. إذا كان هناك التهاب لثة، نبدأ بتنظيف وعلاج الالتهاب ثم نحدد خطة التقويم المناسبة."
+      : "Braces can start after gum evaluation. If there is gingival inflammation, we usually treat it first, then proceed with the orthodontic plan.";
+  }
+
+  return isAr
+    ? "شكراً لسؤالك. أستطيع تقديم إرشاد مبدئي، لكن التشخيص الدقيق يحتاج فحصاً سريرياً مع الدكتور أحمد طارق. يمكنك حجز موعد وسنرتب الخطة الأنسب لحالتك."
+    : "Thanks for your question. I can provide initial guidance, but accurate diagnosis requires a clinical exam with Dr. Ahmed Tarek. You can book an appointment for a tailored treatment plan.";
+}
+
 export default function Consultation() {
   const { lang } = useI18n();
   const isAr = lang === "ar";
@@ -135,44 +180,12 @@ export default function Consultation() {
       : "I can't answer this question right now because it is outside the clinic assistant scope or unavailable through the AI system. The best option is to book a session with Dr. Ahmed Tarek.";
 
     try {
-      const resp = await fetch(toApiUrl("/api/ai-chat"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          history: messages.slice(-10),
-        }),
-      });
+      const fullReply = buildLocalConsultationReply(text, isAr);
 
-      const reader = resp.body?.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let receivedError = false;
-
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.error) {
-              assistantMsg.content = unsupportedReply;
-              setMessages([...newMessages, { ...assistantMsg }]);
-              receivedError = true;
-              break;
-            }
-            if (data.content) {
-              assistantMsg.content += data.content;
-              setMessages([...newMessages, { ...assistantMsg }]);
-            }
-          } catch {}
-        }
-
-        if (receivedError) break;
+      for (let i = 0; i < fullReply.length; i += 4) {
+        assistantMsg.content = fullReply.slice(0, i + 4);
+        setMessages([...newMessages, { ...assistantMsg }]);
+        await new Promise((resolve) => setTimeout(resolve, 12));
       }
 
       if (!assistantMsg.content.trim()) {

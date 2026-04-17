@@ -1,4 +1,4 @@
-import { toApiUrl } from "@/lib/api-base";
+import { getApiBaseUrl, toApiUrl } from "@/lib/api-base";
 
 const LOCAL_API_BASES = [
   "http://localhost:8081",
@@ -43,9 +43,19 @@ function normalizeApiPath(path: string): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
+function isApiPath(path: string): boolean {
+  return path === "/api" || path.startsWith("/api/");
+}
+
 function shouldTryLocalFallback(): boolean {
   if (typeof window === "undefined") return true;
   return LOCAL_HOSTS.has(window.location.hostname.toLowerCase());
+}
+
+function isMissingApiBaseOnHostedClient(path: string): boolean {
+  if (!isApiPath(path)) return false;
+  if (shouldTryLocalFallback()) return false;
+  return !getApiBaseUrl();
 }
 
 function buildCandidateUrls(path: string): string[] {
@@ -75,6 +85,11 @@ function isRetryableStatus(status: number): boolean {
   return status === 404 || status === 405 || status === 502 || status === 503 || status === 504;
 }
 
+function looksLikeHtmlDocument(value: string): boolean {
+  const sample = value.trimStart().slice(0, 120).toLowerCase();
+  return sample.startsWith("<!doctype html") || sample.startsWith("<html");
+}
+
 async function parseResponseBody(response: Response): Promise<unknown> {
   if (response.status === 204 || response.status === 205) return null;
 
@@ -93,6 +108,10 @@ function summarizeHttpFailure(status: number, url: string, data: unknown): strin
 
   const extracted = extractApiErrorMessage(data);
   if (extracted) return `${base}: ${extracted}`;
+
+  if (typeof data === "string" && looksLikeHtmlDocument(data) && url.includes("/api/")) {
+    return `${base}: API returned HTML instead of JSON. Configure VITE_API_BASE_URL to your deployed backend URL.`;
+  }
 
   if (typeof data === "string" && data.trim()) {
     return `${base}: ${data.trim().slice(0, 220)}`;
@@ -116,7 +135,21 @@ export async function requestApiJson<T = unknown>(
   path: string,
   init?: RequestInit,
 ): Promise<ApiRequestResult<T>> {
-  const attempts = buildCandidateUrls(path);
+  const normalizedPath = normalizeApiPath(path);
+
+  if (isMissingApiBaseOnHostedClient(normalizedPath)) {
+    throw new ApiRequestError(
+      "API base URL is not configured for this deployed frontend. Set VITE_API_BASE_URL to your backend URL.",
+      {
+        status: 0,
+        data: null,
+        url: null,
+        attempts: [],
+      },
+    );
+  }
+
+  const attempts = buildCandidateUrls(normalizedPath);
   let networkErrorMessage: string | null = null;
   let lastHttpFailure: { status: number; data: unknown; url: string } | null = null;
 

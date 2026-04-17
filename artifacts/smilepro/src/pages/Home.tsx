@@ -1,5 +1,5 @@
 import { useI18n } from "@/lib/i18n";
-import { useGetClinicStats, useListServices } from "@workspace/api-client-react";
+import { useLocalClinicStore } from "@/lib/local-clinic-store";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
@@ -53,8 +53,7 @@ const WA_SCREENSHOTS = [wa1, wa2, wa3, wa4, wa5];
 
 export default function Home() {
   const { t, lang, dir } = useI18n();
-  const { data: stats } = useGetClinicStats();
-  const { data: services } = useListServices();
+  const { stats } = useLocalClinicStore();
 
   const isRtl = dir === "rtl";
   const isAr = lang === "ar";

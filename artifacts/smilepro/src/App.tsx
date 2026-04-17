@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { I18nProvider } from "@/lib/i18n";
+import { LocalClinicStoreProvider } from "@/lib/local-clinic-store";
 import { useState } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -79,10 +80,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <I18nProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
-            <Toaster />
+            <LocalClinicStoreProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+              <Toaster />
+            </LocalClinicStoreProvider>
           </I18nProvider>
         </TooltipProvider>
       </QueryClientProvider>

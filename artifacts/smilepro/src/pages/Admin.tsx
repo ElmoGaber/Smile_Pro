@@ -1,11 +1,11 @@
 import { useI18n } from "@/lib/i18n";
 import {
-  useListAppointments,
-  useGetClinicStats,
-  useUpdateAppointmentStatus,
-  getListAppointmentsQueryKey,
+  useLocalClinicStore,
+  type AppointmentStatus,
+  type LocalAnalytics,
+  type LocalPromotion,
   type UpdateAppointmentStatusBodyStatus,
-} from "@workspace/api-client-react";
+} from "@/lib/local-clinic-store";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,298 +19,76 @@ import {
   MoreHorizontal, CalendarCheck, CheckCircle2, Clock, CalendarDays,
   LogOut, Users, BarChart3, Tag, Plus, Trash2, Edit3, ToggleLeft, ToggleRight
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { ApiRequestError, extractApiErrorMessage, requestApiJson } from "@/lib/api-request";
+import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from "recharts";
 
 interface AdminProps { onLogout: () => void; }
-type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
 type Tab = "overview" | "appointments" | "analytics" | "promotions";
 
-interface Promo {
-  id?: number;
-  titleAr: string;
-  titleEn: string;
-  discount: string;
-  descriptionAr: string;
-  descriptionEn: string;
-  isActive: boolean;
-}
-
-interface Analytics {
-  peakHours: { time: string; count: number }[];
-  dailyTrend: { date: string; count: number }[];
-  serviceBreakdown: { service: string; count: number }[];
-  statusBreakdown: { status: string; count: number }[];
-}
+type Promo = LocalPromotion;
+type Analytics = LocalAnalytics;
+type PromoForm = Omit<Promo, "id">;
 
 const PIE_COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
-
-function toSafeNumber(value: unknown): number {
-  const parsed = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function emptyAnalytics(): Analytics {
-  return {
-    peakHours: [],
-    dailyTrend: [],
-    serviceBreakdown: [],
-    statusBreakdown: [
-      { status: "pending", count: 0 },
-      { status: "confirmed", count: 0 },
-      { status: "completed", count: 0 },
-      { status: "cancelled", count: 0 },
-    ],
-  };
-}
-
-function normalizeAnalytics(payload: unknown): Analytics {
-  if (!payload || typeof payload !== "object") return emptyAnalytics();
-
-  const source = payload as Record<string, unknown>;
-
-  const peakHours = Array.isArray(source.peakHours)
-    ? source.peakHours
-        .map((item) => {
-          if (!item || typeof item !== "object") return null;
-          const row = item as Record<string, unknown>;
-          return {
-            time: typeof row.time === "string" ? row.time : "Unknown",
-            count: toSafeNumber(row.count),
-          };
-        })
-        .filter((item): item is { time: string; count: number } => item !== null)
-    : [];
-
-  const dailyTrend = Array.isArray(source.dailyTrend)
-    ? source.dailyTrend
-        .map((item) => {
-          if (!item || typeof item !== "object") return null;
-          const row = item as Record<string, unknown>;
-          return {
-            date: typeof row.date === "string" ? row.date : "",
-            count: toSafeNumber(row.count),
-          };
-        })
-        .filter((item): item is { date: string; count: number } => item !== null)
-    : [];
-
-  const serviceBreakdown = Array.isArray(source.serviceBreakdown)
-    ? source.serviceBreakdown
-        .map((item) => {
-          if (!item || typeof item !== "object") return null;
-          const row = item as Record<string, unknown>;
-          return {
-            service: typeof row.service === "string" ? row.service : "Other",
-            count: toSafeNumber(row.count),
-          };
-        })
-        .filter((item): item is { service: string; count: number } => item !== null)
-    : [];
-
-  const statusBreakdown = Array.isArray(source.statusBreakdown)
-    ? source.statusBreakdown
-        .map((item) => {
-          if (!item || typeof item !== "object") return null;
-          const row = item as Record<string, unknown>;
-          return {
-            status: typeof row.status === "string" ? row.status : "unknown",
-            count: toSafeNumber(row.count),
-          };
-        })
-        .filter((item): item is { status: string; count: number } => item !== null)
-    : [];
-
-  return {
-    peakHours,
-    dailyTrend,
-    serviceBreakdown,
-    statusBreakdown: statusBreakdown.length > 0 ? statusBreakdown : emptyAnalytics().statusBreakdown,
-  };
-}
 
 export default function Admin({ onLogout }: AdminProps) {
   const { lang } = useI18n();
   const isAr = lang === "ar";
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { data: stats } = useGetClinicStats();
-  const { data: appointments, isLoading } = useListAppointments();
-  const updateStatus = useUpdateAppointmentStatus();
+  const {
+    stats,
+    appointments,
+    promotions,
+    analytics,
+    upsertPromotion,
+    deletePromotion,
+    togglePromotion,
+    updateAppointmentStatus,
+  } = useLocalClinicStore();
+  const isLoading = false;
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [promotions, setPromotions] = useState<Promo[]>([]);
-  const [promoForm, setPromoForm] = useState<Promo>({
+  const [promoForm, setPromoForm] = useState<PromoForm>({
     titleAr: "", titleEn: "", discount: "", descriptionAr: "", descriptionEn: "", isActive: true,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSavingPromo, setIsSavingPromo] = useState(false);
-  const safeAppointments = Array.isArray(appointments) ? appointments : [];
+  const safeAppointments = Array.isArray(appointments)
+    ? [...appointments].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+    : [];
   const safePromotions = Array.isArray(promotions) ? promotions : [];
-
-  function notifyPromotionsUpdated() {
-    window.dispatchEvent(new Event("promotions-updated"));
-  }
-
-  useEffect(() => {
-    if (activeTab === "analytics") {
-      void (async () => {
-        try {
-          const { data } = await requestApiJson<unknown>("/api/analytics/appointments");
-          setAnalytics(normalizeAnalytics(data));
-        } catch (error) {
-          setAnalytics(emptyAnalytics());
-
-          const reason =
-            error instanceof ApiRequestError
-              ? extractApiErrorMessage(error.data) ?? error.message
-              : error instanceof Error
-                ? error.message
-                : undefined;
-
-          toast({
-            title: isAr ? "تعذر تحميل التحليلات" : "Failed to load analytics",
-            description: reason,
-            variant: "destructive",
-          });
-        }
-      })();
-    }
-    if (activeTab === "promotions") {
-      void loadPromotions();
-    }
-  }, [activeTab, isAr, toast]);
-
-  async function loadPromotions() {
-    try {
-      const { data } = await requestApiJson<unknown>("/api/promotions");
-      if (!Array.isArray(data)) {
-        throw new Error(isAr ? "صيغة بيانات العروض غير متوقعة" : "Unexpected promotions response format");
-      }
-
-      setPromotions(data as Promo[]);
-    } catch (error) {
-      setPromotions([]);
-
-      const reason =
-        error instanceof ApiRequestError
-          ? extractApiErrorMessage(error.data) ?? error.message
-          : error instanceof Error
-            ? error.message
-            : undefined;
-
-      toast({
-        title: isAr ? "تعذر تحميل العروض" : "Failed to load promotions",
-        description: reason,
-        variant: "destructive",
-      });
-    }
-  }
 
   async function savePromo() {
     setIsSavingPromo(true);
     try {
-      const path = editingId ? `/api/promotions/${editingId}` : "/api/promotions";
-      const method = editingId ? "PUT" : "POST";
-      await requestApiJson(path, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(promoForm),
-      });
+      upsertPromotion(promoForm, editingId);
 
       toast({ title: isAr ? "تم الحفظ بنجاح" : "Saved successfully" });
       setPromoForm({ titleAr: "", titleEn: "", discount: "", descriptionAr: "", descriptionEn: "", isActive: true });
       setEditingId(null);
-      await loadPromotions();
-      notifyPromotionsUpdated();
-    } catch (error) {
-      const reason =
-        error instanceof ApiRequestError
-          ? extractApiErrorMessage(error.data) ?? error.message
-          : error instanceof Error
-            ? error.message
-            : undefined;
-
-      toast({
-        title: isAr ? "تعذر حفظ العرض" : "Failed to save promotion",
-        description: reason,
-        variant: "destructive",
-      });
     } finally {
       setIsSavingPromo(false);
     }
   }
 
   async function deletePromo(id: number) {
-    try {
-      await requestApiJson(`/api/promotions/${id}`, { method: "DELETE" });
-
-      toast({ title: isAr ? "تم الحذف" : "Deleted" });
-      await loadPromotions();
-      notifyPromotionsUpdated();
-    } catch (error) {
-      const reason =
-        error instanceof ApiRequestError
-          ? extractApiErrorMessage(error.data) ?? error.message
-          : error instanceof Error
-            ? error.message
-            : undefined;
-
-      toast({
-        title: isAr ? "تعذر حذف العرض" : "Failed to delete promotion",
-        description: reason,
-        variant: "destructive",
-      });
-    }
+    deletePromotion(id);
+    toast({ title: isAr ? "تم الحذف" : "Deleted" });
   }
 
   async function togglePromo(p: Promo) {
-    if (!p.id) return;
-    try {
-      await requestApiJson(`/api/promotions/${p.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...p, isActive: !p.isActive }),
-      });
-
-      await loadPromotions();
-      notifyPromotionsUpdated();
-    } catch (error) {
-      const reason =
-        error instanceof ApiRequestError
-          ? extractApiErrorMessage(error.data) ?? error.message
-          : error instanceof Error
-            ? error.message
-            : undefined;
-
-      toast({
-        title: isAr ? "تعذر تحديث الحالة" : "Failed to update status",
-        description: reason,
-        variant: "destructive",
-      });
-    }
+    togglePromotion(p.id);
   }
 
   const handleStatusChange = (id: number, status: UpdateAppointmentStatusBodyStatus) => {
-    updateStatus.mutate(
-      { id, data: { status } },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListAppointmentsQueryKey() });
-          toast({ title: isAr ? "تم تحديث الحالة بنجاح" : "Status updated successfully" });
-        },
-        onError: () => {
-          toast({ title: isAr ? "فشل تحديث الحالة" : "Failed to update status", variant: "destructive" });
-        }
-      }
-    );
+    updateAppointmentStatus(id, status);
+    toast({ title: isAr ? "تم تحديث الحالة بنجاح" : "Status updated successfully" });
   };
 
   const getStatusBadge = (status: AppointmentStatus) => {

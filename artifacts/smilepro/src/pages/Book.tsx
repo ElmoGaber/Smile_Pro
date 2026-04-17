@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useListServices } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ApiRequestError, extractApiErrorMessage, requestApiJson } from "@/lib/api-request";
+import { useLocalClinicStore } from "@/lib/local-clinic-store";
 import bookingSmileImg from "@assets/image_1776299517022.png";
 
 const formSchema = z.object({
@@ -60,23 +59,9 @@ const TIME_SLOTS = [
 export default function Book() {
   const { t, lang } = useI18n();
   const { toast } = useToast();
-  const { data: services } = useListServices();
+  const { createAppointment } = useLocalClinicStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const safeServices: ServiceOption[] =
-    Array.isArray(services) && services.length > 0
-      ? services
-          .map((item) => ({
-            id: typeof item.id === "number" ? item.id : Number.NaN,
-            nameEn: typeof item.nameEn === "string" ? item.nameEn : "",
-            nameAr: typeof item.nameAr === "string" ? item.nameAr : "",
-          }))
-          .filter(
-            (item) =>
-              Number.isFinite(item.id) &&
-              item.nameEn.trim().length > 0 &&
-              item.nameAr.trim().length > 0,
-          )
-      : FALLBACK_SERVICES;
+  const safeServices: ServiceOption[] = FALLBACK_SERVICES;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -95,17 +80,14 @@ export default function Book() {
 
     setIsSubmitting(true);
     try {
-      await requestApiJson("/api/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          patientEmail: data.patientEmail || null,
-          preferredDate: format(data.preferredDate, "yyyy-MM-dd"),
-          notes: data.notes || null,
-        }),
+      createAppointment({
+        patientName: data.patientName,
+        patientPhone: data.patientPhone,
+        patientEmail: data.patientEmail || null,
+        service: data.service,
+        preferredDate: format(data.preferredDate, "yyyy-MM-dd"),
+        preferredTime: data.preferredTime,
+        notes: data.notes || null,
       });
 
       toast({
@@ -113,19 +95,6 @@ export default function Book() {
         variant: "default",
       });
       form.reset();
-    } catch (error) {
-      const description =
-        error instanceof ApiRequestError
-          ? extractApiErrorMessage(error.data) ?? error.message
-          : error instanceof Error
-            ? error.message
-            : undefined;
-
-      toast({
-        title: t("error"),
-        description,
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }
