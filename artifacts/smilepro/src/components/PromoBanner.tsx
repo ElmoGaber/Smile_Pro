@@ -13,8 +13,6 @@ interface Promotion {
   isActive: boolean;
 }
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-
 export function PromoBanner() {
   const { lang } = useI18n();
   const isAr = lang === "ar";
@@ -25,7 +23,7 @@ export function PromoBanner() {
 
   const loadPromotions = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE}/api/promotions/active`);
+      const res = await fetch(`/api/promotions/active`);
       const payload = await res.json().catch(() => null);
 
       if (!res.ok || !Array.isArray(payload)) {

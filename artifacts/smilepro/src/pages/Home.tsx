@@ -109,10 +109,6 @@ export default function Home() {
                   className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all backdrop-blur">
                   <FaWhatsapp className="h-4 w-4" />
                 </a>
-                <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01067678454" title="WhatsApp 01067678454"
-                  className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all backdrop-blur">
-                  <FaWhatsapp className="h-4 w-4" />
-                </a>
               </motion.div>
             </motion.div>
           </div>
@@ -315,12 +311,6 @@ export default function Home() {
                 <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-full border-white text-white hover:bg-white hover:text-primary">
                   <FaWhatsapp className="me-2 h-5 w-5" />
                   WhatsApp 01095530001
-                </Button>
-              </a>
-              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-full border-white text-white hover:bg-white hover:text-primary">
-                  <FaWhatsapp className="me-2 h-5 w-5" />
-                  WhatsApp 01067678454
                 </Button>
               </a>
             </div>

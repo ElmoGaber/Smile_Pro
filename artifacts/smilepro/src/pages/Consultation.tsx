@@ -6,8 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot, User, AlertTriangle, Clock, Pill, ChevronDown, ChevronUp, MapPin, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -89,7 +87,7 @@ export default function Consultation() {
     setMessages([...newMessages, assistantMsg]);
 
     try {
-      const resp = await fetch(`${BASE}/api/ai-chat`, {
+      const resp = await fetch(`/api/ai-chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -300,10 +298,6 @@ export default function Consultation() {
                 <FaWhatsapp className="h-4 w-4" />
                 {isAr ? "احجز على واتساب 01095530001" : "Book via WhatsApp 01095530001"}
               </a>
-              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" className="mt-2 flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
-                <FaWhatsapp className="h-4 w-4" />
-                {isAr ? "احجز على واتساب 01067678454" : "Book via WhatsApp 01067678454"}
-              </a>
             </div>
 
             {/* Contact quick */}
@@ -312,10 +306,7 @@ export default function Consultation() {
                 <Phone className="h-4 w-4 text-primary" />
                 {isAr ? "تواصل سريع" : "Quick Contact"}
               </h3>
-              <div dir="ltr" className="space-y-1 text-center">
-                <a href="tel:01095530001" className="block text-primary font-bold text-lg hover:underline">01095530001</a>
-                <a href="tel:01067678454" className="block text-primary font-bold text-lg hover:underline">01067678454</a>
-              </div>
+              <a href="tel:01095530001" dir="ltr" className="block text-primary font-bold text-lg hover:underline text-center">01095530001</a>
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
                 <span>{isAr ? "دمياط الجديدة — تقاطع شارع البشبيشي مع شارع ابو الخير — أعلى ماركت كازيون" : "New Damietta — Intersection of El-Beshbishi St. and Abu El-Kheir St. — Above Kazyon Market"}</span>

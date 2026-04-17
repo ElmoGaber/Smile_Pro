@@ -68,10 +68,21 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? (isAr ? "إخفاء كلمة المرور" : "Hide password") : (isAr ? "إظهار كلمة المرور" : "Show password")}
+                  title={showPassword ? (isAr ? "إخفاء كلمة المرور" : "Hide password") : (isAr ? "إظهار كلمة المرور" : "Show password")}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-xs text-primary hover:underline"
+              >
+                {showPassword
+                  ? (isAr ? "إخفاء كلمة المرور" : "Hide password")
+                  : (isAr ? "إظهار كلمة المرور" : "Show password")}
+              </button>
               {error && (
                 <p className="text-sm text-destructive">{t("admin.login.wrong")}</p>
               )}

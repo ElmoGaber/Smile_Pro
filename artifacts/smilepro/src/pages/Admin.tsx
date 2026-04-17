@@ -28,8 +28,6 @@ import {
   PieChart, Pie, Cell, Legend
 } from "recharts";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-
 interface AdminProps { onLogout: () => void; }
 type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
 type Tab = "overview" | "appointments" | "analytics" | "promotions";
@@ -175,7 +173,7 @@ export default function Admin({ onLogout }: AdminProps) {
     if (activeTab === "analytics") {
       void (async () => {
         try {
-          const res = await fetch(`${BASE}/api/analytics/appointments`);
+          const res = await fetch(`/api/analytics/appointments`);
           const payload = await res.json().catch(() => null);
 
           if (!res.ok) {
@@ -205,7 +203,7 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function loadPromotions() {
     try {
-      const res = await fetch(`${BASE}/api/promotions`);
+      const res = await fetch(`/api/promotions`);
 
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
@@ -232,7 +230,7 @@ export default function Admin({ onLogout }: AdminProps) {
   async function savePromo() {
     setIsSavingPromo(true);
     try {
-      const url = editingId ? `${BASE}/api/promotions/${editingId}` : `${BASE}/api/promotions`;
+      const url = editingId ? `/api/promotions/${editingId}` : `/api/promotions`;
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -264,7 +262,7 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function deletePromo(id: number) {
     try {
-      const res = await fetch(`${BASE}/api/promotions/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/promotions/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
         const reason = getApiErrorMessage(payload);
@@ -285,7 +283,7 @@ export default function Admin({ onLogout }: AdminProps) {
   async function togglePromo(p: Promo) {
     if (!p.id) return;
     try {
-      const res = await fetch(`${BASE}/api/promotions/${p.id}`, {
+      const res = await fetch(`/api/promotions/${p.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...p, isActive: !p.isActive }),
