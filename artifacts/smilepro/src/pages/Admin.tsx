@@ -23,7 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { toApiUrl } from "@/lib/api-base";
+import { ApiRequestError, extractApiErrorMessage, requestApiJson } from "@/lib/api-request";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
@@ -51,17 +51,6 @@ interface Analytics {
 }
 
 const PIE_COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
-
-function getApiErrorMessage(payload: unknown): string | null {
-  if (!payload || typeof payload !== "object") return null;
-
-  const candidate = payload as Record<string, unknown>;
-  const value = candidate.error ?? candidate.message ?? candidate.detail;
-
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
 
 function toSafeNumber(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(value);
@@ -174,24 +163,21 @@ export default function Admin({ onLogout }: AdminProps) {
     if (activeTab === "analytics") {
       void (async () => {
         try {
-          const res = await fetch(toApiUrl("/api/analytics/appointments"));
-          const payload = await res.json().catch(() => null);
-
-          if (!res.ok) {
-            const reason = getApiErrorMessage(payload);
-            toast({
-              title: isAr ? "تعذر تحميل التحليلات" : "Failed to load analytics",
-              description: reason ?? undefined,
-              variant: "destructive",
-            });
-          }
-
-          setAnalytics(normalizeAnalytics(payload));
+          const { data } = await requestApiJson<unknown>("/api/analytics/appointments");
+          setAnalytics(normalizeAnalytics(data));
         } catch (error) {
           setAnalytics(emptyAnalytics());
+
+          const reason =
+            error instanceof ApiRequestError
+              ? extractApiErrorMessage(error.data) ?? error.message
+              : error instanceof Error
+                ? error.message
+                : undefined;
+
           toast({
             title: isAr ? "تعذر تحميل التحليلات" : "Failed to load analytics",
-            description: error instanceof Error ? error.message : undefined,
+            description: reason,
             variant: "destructive",
           });
         }
@@ -204,25 +190,25 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function loadPromotions() {
     try {
-      const res = await fetch(toApiUrl("/api/promotions"));
-
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        const reason = getApiErrorMessage(payload);
-        throw new Error(reason ?? (isAr ? "تعذر تحميل العروض" : "Failed to load promotions"));
-      }
-
-      const payload: unknown = await res.json();
-      if (!Array.isArray(payload)) {
+      const { data } = await requestApiJson<unknown>("/api/promotions");
+      if (!Array.isArray(data)) {
         throw new Error(isAr ? "صيغة بيانات العروض غير متوقعة" : "Unexpected promotions response format");
       }
 
-      setPromotions(payload as Promo[]);
+      setPromotions(data as Promo[]);
     } catch (error) {
       setPromotions([]);
+
+      const reason =
+        error instanceof ApiRequestError
+          ? extractApiErrorMessage(error.data) ?? error.message
+          : error instanceof Error
+            ? error.message
+            : undefined;
+
       toast({
         title: isAr ? "تعذر تحميل العروض" : "Failed to load promotions",
-        description: error instanceof Error ? error.message : undefined,
+        description: reason,
         variant: "destructive",
       });
     }
@@ -231,21 +217,13 @@ export default function Admin({ onLogout }: AdminProps) {
   async function savePromo() {
     setIsSavingPromo(true);
     try {
-      const url = editingId
-        ? toApiUrl(`/api/promotions/${editingId}`)
-        : toApiUrl("/api/promotions");
+      const path = editingId ? `/api/promotions/${editingId}` : "/api/promotions";
       const method = editingId ? "PUT" : "POST";
-      const res = await fetch(url, {
+      await requestApiJson(path, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(promoForm),
       });
-
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        const reason = getApiErrorMessage(payload);
-        throw new Error(reason ?? (isAr ? "تعذر حفظ العرض" : "Failed to save promotion"));
-      }
 
       toast({ title: isAr ? "تم الحفظ بنجاح" : "Saved successfully" });
       setPromoForm({ titleAr: "", titleEn: "", discount: "", descriptionAr: "", descriptionEn: "", isActive: true });
@@ -253,9 +231,16 @@ export default function Admin({ onLogout }: AdminProps) {
       await loadPromotions();
       notifyPromotionsUpdated();
     } catch (error) {
+      const reason =
+        error instanceof ApiRequestError
+          ? extractApiErrorMessage(error.data) ?? error.message
+          : error instanceof Error
+            ? error.message
+            : undefined;
+
       toast({
         title: isAr ? "تعذر حفظ العرض" : "Failed to save promotion",
-        description: error instanceof Error ? error.message : undefined,
+        description: reason,
         variant: "destructive",
       });
     } finally {
@@ -265,19 +250,22 @@ export default function Admin({ onLogout }: AdminProps) {
 
   async function deletePromo(id: number) {
     try {
-      const res = await fetch(toApiUrl(`/api/promotions/${id}`), { method: "DELETE" });
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        const reason = getApiErrorMessage(payload);
-        throw new Error(reason ?? (isAr ? "تعذر حذف العرض" : "Failed to delete promotion"));
-      }
+      await requestApiJson(`/api/promotions/${id}`, { method: "DELETE" });
+
       toast({ title: isAr ? "تم الحذف" : "Deleted" });
       await loadPromotions();
       notifyPromotionsUpdated();
     } catch (error) {
+      const reason =
+        error instanceof ApiRequestError
+          ? extractApiErrorMessage(error.data) ?? error.message
+          : error instanceof Error
+            ? error.message
+            : undefined;
+
       toast({
         title: isAr ? "تعذر حذف العرض" : "Failed to delete promotion",
-        description: error instanceof Error ? error.message : undefined,
+        description: reason,
         variant: "destructive",
       });
     }
@@ -286,24 +274,25 @@ export default function Admin({ onLogout }: AdminProps) {
   async function togglePromo(p: Promo) {
     if (!p.id) return;
     try {
-      const res = await fetch(toApiUrl(`/api/promotions/${p.id}`), {
+      await requestApiJson(`/api/promotions/${p.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...p, isActive: !p.isActive }),
       });
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        const reason = getApiErrorMessage(payload);
-        throw new Error(reason ?? (isAr ? "تعذر تحديث حالة العرض" : "Failed to update promotion status"));
-      }
-
       await loadPromotions();
       notifyPromotionsUpdated();
     } catch (error) {
+      const reason =
+        error instanceof ApiRequestError
+          ? extractApiErrorMessage(error.data) ?? error.message
+          : error instanceof Error
+            ? error.message
+            : undefined;
+
       toast({
         title: isAr ? "تعذر تحديث الحالة" : "Failed to update status",
-        description: error instanceof Error ? error.message : undefined,
+        description: reason,
         variant: "destructive",
       });
     }

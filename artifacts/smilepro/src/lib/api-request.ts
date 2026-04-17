@@ -1,0 +1,162 @@
+import { toApiUrl } from "@/lib/api-base";
+
+const LOCAL_API_BASES = [
+  "http://localhost:8081",
+  "http://127.0.0.1:8081",
+  "http://0.0.0.0:8081",
+];
+
+type ApiRequestResult<T> = {
+  response: Response;
+  data: T;
+  url: string;
+};
+
+type ApiRequestErrorOptions = {
+  status?: number;
+  data?: unknown;
+  url?: string | null;
+  attempts: string[];
+};
+
+export class ApiRequestError extends Error {
+  readonly status: number;
+  readonly data: unknown;
+  readonly url: string | null;
+  readonly attempts: string[];
+
+  constructor(message: string, options: ApiRequestErrorOptions) {
+    super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
+
+    this.name = "ApiRequestError";
+    this.status = options.status ?? 0;
+    this.data = options.data ?? null;
+    this.url = options.url ?? null;
+    this.attempts = options.attempts;
+  }
+}
+
+function normalizeApiPath(path: string): string {
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
+function buildCandidateUrls(path: string): string[] {
+  const normalizedPath = normalizeApiPath(path);
+  const candidates = [
+    toApiUrl(normalizedPath),
+    normalizedPath,
+    ...LOCAL_API_BASES.map((base) => `${base}${normalizedPath}`),
+  ];
+
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const candidate of candidates) {
+    if (seen.has(candidate)) continue;
+    seen.add(candidate);
+    unique.push(candidate);
+  }
+
+  return unique;
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 404 || status === 405 || status === 502 || status === 503 || status === 504;
+}
+
+async function parseResponseBody(response: Response): Promise<unknown> {
+  if (response.status === 204 || response.status === 205) return null;
+
+  const raw = await response.text();
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return raw;
+  }
+}
+
+function summarizeHttpFailure(status: number, url: string, data: unknown): string {
+  const base = `HTTP ${status} from ${url}`;
+
+  const extracted = extractApiErrorMessage(data);
+  if (extracted) return `${base}: ${extracted}`;
+
+  if (typeof data === "string" && data.trim()) {
+    return `${base}: ${data.trim().slice(0, 220)}`;
+  }
+
+  return base;
+}
+
+export function extractApiErrorMessage(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+
+  const candidate = payload as Record<string, unknown>;
+  const value = candidate.error ?? candidate.message ?? candidate.detail;
+  if (typeof value !== "string") return null;
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+export async function requestApiJson<T = unknown>(
+  path: string,
+  init?: RequestInit,
+): Promise<ApiRequestResult<T>> {
+  const attempts = buildCandidateUrls(path);
+  let networkErrorMessage: string | null = null;
+  let lastHttpFailure: { status: number; data: unknown; url: string } | null = null;
+
+  for (const url of attempts) {
+    try {
+      const response = await fetch(url, init);
+      const data = await parseResponseBody(response);
+
+      if (response.ok) {
+        return {
+          response,
+          data: data as T,
+          url,
+        };
+      }
+
+      lastHttpFailure = { status: response.status, data, url };
+
+      if (!isRetryableStatus(response.status)) {
+        throw new ApiRequestError(summarizeHttpFailure(response.status, url, data), {
+          status: response.status,
+          data,
+          url,
+          attempts,
+        });
+      }
+    } catch (error) {
+      if (error instanceof ApiRequestError) {
+        throw error;
+      }
+
+      networkErrorMessage = error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  if (lastHttpFailure) {
+    throw new ApiRequestError(
+      summarizeHttpFailure(lastHttpFailure.status, lastHttpFailure.url, lastHttpFailure.data),
+      {
+        status: lastHttpFailure.status,
+        data: lastHttpFailure.data,
+        url: lastHttpFailure.url,
+        attempts,
+      },
+    );
+  }
+
+  throw new ApiRequestError(networkErrorMessage ?? "Failed to reach API", {
+    status: 0,
+    data: null,
+    url: null,
+    attempts,
+  });
+}

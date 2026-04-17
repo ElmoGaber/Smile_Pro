@@ -1,8 +1,9 @@
 import { useI18n } from "@/lib/i18n";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useCreateAppointment, useListServices } from "@workspace/api-client-react";
+import { useListServices } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ApiRequestError, extractApiErrorMessage, requestApiJson } from "@/lib/api-request";
 import bookingSmileImg from "@assets/image_1776299517022.png";
 
 const formSchema = z.object({
@@ -59,7 +61,7 @@ export default function Book() {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const { data: services } = useListServices();
-  const createAppointment = useCreateAppointment();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const safeServices: ServiceOption[] =
     Array.isArray(services) && services.length > 0
       ? services
@@ -88,32 +90,45 @@ export default function Book() {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    createAppointment.mutate(
-      {
-        data: {
+  const onSubmit = async (data: FormValues) => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await requestApiJson("/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           ...data,
           patientEmail: data.patientEmail || null,
           preferredDate: format(data.preferredDate, "yyyy-MM-dd"),
           notes: data.notes || null,
-        }
-      },
-      {
-        onSuccess: () => {
-          toast({
-            title: t("book.success"),
-            variant: "default",
-          });
-          form.reset();
-        },
-        onError: () => {
-          toast({
-            title: t("error"),
-            variant: "destructive",
-          });
-        }
-      }
-    );
+        }),
+      });
+
+      toast({
+        title: t("book.success"),
+        variant: "default",
+      });
+      form.reset();
+    } catch (error) {
+      const description =
+        error instanceof ApiRequestError
+          ? extractApiErrorMessage(error.data) ?? error.message
+          : error instanceof Error
+            ? error.message
+            : undefined;
+
+      toast({
+        title: t("error"),
+        description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isAr = lang === "ar";
@@ -345,9 +360,9 @@ export default function Book() {
               type="submit" 
               size="lg" 
               className="w-full text-lg h-14 rounded-xl"
-              disabled={createAppointment.isPending}
+              disabled={isSubmitting}
             >
-              {createAppointment.isPending ? t("book.submitting") : t("book.submit")}
+              {isSubmitting ? t("book.submitting") : t("book.submit")}
             </Button>
           </form>
         </Form>
