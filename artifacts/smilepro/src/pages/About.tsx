@@ -103,13 +103,17 @@ export default function About() {
                   <MapPin className="h-4 w-4 text-primary shrink-0" />
                   <span>
                     {isAr
-                      ? "دمياط الجديدة — إمتداد شارع الصحبجية — أمام مسجد النور — أعلي إسلامكو"
-                      : "New Damietta — Al-Sahbajeya St. Extension — In front of Al-Nour Mosque"}
+                      ? "دمياط الجديدة — تقاطع شارع البشبيشي مع شارع ابو الخير — أعلى ماركت كازيون"
+                      : "New Damietta — Intersection of El-Beshbishi St. and Abu El-Kheir St. — Above Kazyon Market"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4 text-primary shrink-0" />
-                  <a href="tel:+201095530001" dir="ltr" className="hover:text-primary">01095530001</a>
+                  <div dir="ltr" className="flex flex-wrap items-center gap-2">
+                    <a href="tel:+201095530001" className="hover:text-primary">01095530001</a>
+                    <span className="text-muted-foreground/60">/</span>
+                    <a href="tel:+201067678454" className="hover:text-primary">01067678454</a>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Mail className="h-4 w-4 text-primary shrink-0" />
@@ -128,7 +132,13 @@ export default function About() {
                 <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="lg" className="rounded-full px-8 gap-2">
                     <FaWhatsapp className="h-4 w-4 text-[#25D366]" />
-                    WhatsApp
+                    WhatsApp 01095530001
+                  </Button>
+                </a>
+                <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="lg" className="rounded-full px-8 gap-2">
+                    <FaWhatsapp className="h-4 w-4 text-[#25D366]" />
+                    WhatsApp 01067678454
                   </Button>
                 </a>
               </div>

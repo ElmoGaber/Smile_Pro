@@ -46,16 +46,27 @@ function Router() {
       </main>
       <Footer />
 
-      {/* WhatsApp Floating Button */}
-      <a
-        href="https://wa.me/201095530001"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 end-6 z-40 size-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
-        aria-label="WhatsApp"
-      >
-        <FaWhatsapp className="h-7 w-7" />
-      </a>
+      {/* WhatsApp Floating Buttons */}
+      <div className="fixed bottom-6 end-6 z-40 flex flex-col gap-3">
+        <a
+          href="https://wa.me/201095530001"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="size-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
+          aria-label="WhatsApp 01095530001"
+        >
+          <FaWhatsapp className="h-7 w-7" />
+        </a>
+        <a
+          href="https://wa.me/201067678454"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="size-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
+          aria-label="WhatsApp 01067678454"
+        >
+          <FaWhatsapp className="h-7 w-7" />
+        </a>
+      </div>
     </div>
   );
 }

@@ -97,15 +97,19 @@ export default function Home() {
 
               {/* Social quick links */}
               <motion.div variants={FADE_UP} className="flex items-center gap-3 mt-10">
-                <a href="https://www.facebook.com/Smilepro.DC" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.facebook.com/Smilepro.DC" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"
                   className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#1877F2] hover:border-[#1877F2] transition-all backdrop-blur">
                   <FaFacebook className="h-4 w-4" />
                 </a>
-                <a href="https://www.instagram.com/dent_ahmed_tarek/" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.instagram.com/dent_ahmed_tarek/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"
                   className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#E1306C] hover:border-[#E1306C] transition-all backdrop-blur">
                   <FaInstagram className="h-4 w-4" />
                 </a>
-                <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01095530001" title="WhatsApp 01095530001"
+                  className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all backdrop-blur">
+                  <FaWhatsapp className="h-4 w-4" />
+                </a>
+                <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01067678454" title="WhatsApp 01067678454"
                   className="size-10 rounded-full bg-background/80 border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all backdrop-blur">
                   <FaWhatsapp className="h-4 w-4" />
                 </a>
@@ -310,7 +314,13 @@ export default function Home() {
               <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-full border-white text-white hover:bg-white hover:text-primary">
                   <FaWhatsapp className="me-2 h-5 w-5" />
-                  WhatsApp
+                  WhatsApp 01095530001
+                </Button>
+              </a>
+              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-full border-white text-white hover:bg-white hover:text-primary">
+                  <FaWhatsapp className="me-2 h-5 w-5" />
+                  WhatsApp 01067678454
                 </Button>
               </a>
             </div>

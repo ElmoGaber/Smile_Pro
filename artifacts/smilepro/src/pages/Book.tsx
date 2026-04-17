@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import bookingSmileImg from "@assets/image_1776299517022.png";
 
 const formSchema = z.object({
   patientName: z.string().min(2, "Name must be at least 2 characters"),
@@ -89,7 +90,7 @@ export default function Book() {
   return (
     <div className="w-full">
       {/* Booking Form */}
-      <div className="container mx-auto px-4 py-16 max-w-3xl">
+      <div className="container mx-auto px-4 py-16 max-w-6xl">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,11 +101,42 @@ export default function Book() {
         <p className="text-muted-foreground">{isAr ? "أكمل البيانات التالية وسنتواصل معك في أقرب وقت" : "Fill in the details below and we'll contact you shortly"}</p>
       </motion.div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+      <motion.aside
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.05 }}
+        className="lg:col-span-2"
+      >
+        <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
+          <div className="relative overflow-hidden rounded-xl">
+            <img
+              src={bookingSmileImg}
+              alt={isAr ? "نتيجة ابتسامة قبل وبعد" : "Before and after smile result"}
+              className="w-full h-[280px] sm:h-[360px] object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/55 to-transparent">
+              <p className="text-white font-semibold text-sm">
+                {isAr ? "نتائج ملموسة بابتسامة أجمل" : "Visible Results, Brighter Smile"}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-3 text-xs">
+            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-center font-medium">
+              {isAr ? "حجز سريع" : "Quick Booking"}
+            </div>
+            <div className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-center font-medium">
+              {isAr ? "تأكيد فوري" : "Fast Confirmation"}
+            </div>
+          </div>
+        </div>
+      </motion.aside>
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-card border border-border rounded-2xl shadow-sm p-6 md:p-10"
+        className="lg:col-span-3 bg-card border border-border rounded-2xl shadow-sm p-6 md:p-10"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -289,6 +321,7 @@ export default function Book() {
           </form>
         </Form>
       </motion.div>
+      </div>
       </div>
     </div>
   );

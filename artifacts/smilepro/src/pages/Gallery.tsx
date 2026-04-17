@@ -151,6 +151,8 @@ export default function Gallery() {
           <button
             className="absolute top-4 end-4 text-white/80 hover:text-white bg-white/10 rounded-full p-2 transition-colors"
             onClick={() => setLightboxImg(null)}
+            aria-label={isAr ? "إغلاق" : "Close"}
+            title={isAr ? "إغلاق" : "Close"}
           >
             <X className="h-6 w-6" />
           </button>
@@ -177,13 +179,13 @@ export default function Gallery() {
             <h2 className="text-2xl font-bold mb-2">{isAr ? "موقع العيادة" : "Clinic Location"}</h2>
             <p className="text-muted-foreground text-sm">
               {isAr
-                ? "دمياط الجديدة — إمتداد شارع الصحبجية — أمام مسجد النور — أعلي إسلامكو للكهربائيات"
-                : "New Damietta — Al-Sahbajeya St. — in front of Al-Nour Mosque — Above Islamco Electronics"}
+                ? "دمياط الجديدة — تقاطع شارع البشبيشي مع شارع ابو الخير — أعلى ماركت كازيون"
+                : "New Damietta — Intersection of El-Beshbishi St. and Abu El-Kheir St. — Above Kazyon Market"}
             </p>
           </div>
           <div className="rounded-2xl overflow-hidden border border-border shadow-sm h-80">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3413.8!2d31.6773!3d31.4361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f7f0f9f9f9f9f9%3A0x0!2z2K/ZhdaqYXQg2KfZhNis2K_ZitijZQ!5e0!3m2!1sar!2seg!4v1699999999999!5m2!1sar!2seg&q=دمياط+الجديدة+شارع+الصحبجية+مسجد+النور&center=31.4361,31.6773&zoom=15"
+              src="https://www.google.com/maps?q=دمياط+الجديدة+تقاطع+شارع+البشبيشي+مع+شارع+ابو+الخير+اعلى+ماركت+كازيون&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -195,7 +197,7 @@ export default function Gallery() {
           </div>
           <div className="flex justify-center mt-4">
             <a
-              href="https://maps.google.com/?q=دمياط+الجديدة+شارع+الصحبجية+مسجد+النور"
+              href="https://maps.google.com/?q=دمياط+الجديدة+تقاطع+شارع+البشبيشي+مع+شارع+ابو+الخير+اعلى+ماركت+كازيون"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary text-sm font-medium hover:underline flex items-center gap-1"

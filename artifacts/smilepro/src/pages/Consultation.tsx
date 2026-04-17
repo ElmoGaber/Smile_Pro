@@ -298,7 +298,11 @@ export default function Consultation() {
               )}
               <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
                 <FaWhatsapp className="h-4 w-4" />
-                {isAr ? "احجز على واتساب" : "Book via WhatsApp"}
+                {isAr ? "احجز على واتساب 01095530001" : "Book via WhatsApp 01095530001"}
+              </a>
+              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" className="mt-2 flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl py-2.5 text-sm font-semibold transition-colors">
+                <FaWhatsapp className="h-4 w-4" />
+                {isAr ? "احجز على واتساب 01067678454" : "Book via WhatsApp 01067678454"}
               </a>
             </div>
 
@@ -308,10 +312,13 @@ export default function Consultation() {
                 <Phone className="h-4 w-4 text-primary" />
                 {isAr ? "تواصل سريع" : "Quick Contact"}
               </h3>
-              <a href="tel:01095530001" dir="ltr" className="block text-primary font-bold text-lg hover:underline text-center">01095530001</a>
+              <div dir="ltr" className="space-y-1 text-center">
+                <a href="tel:01095530001" className="block text-primary font-bold text-lg hover:underline">01095530001</a>
+                <a href="tel:01067678454" className="block text-primary font-bold text-lg hover:underline">01067678454</a>
+              </div>
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
-                <span>{isAr ? "دمياط الجديدة — إمتداد شارع الصحبجية — أمام مسجد النور" : "New Damietta — Al-Sahbajeya St. — in front of Al-Nour Mosque"}</span>
+                <span>{isAr ? "دمياط الجديدة — تقاطع شارع البشبيشي مع شارع ابو الخير — أعلى ماركت كازيون" : "New Damietta — Intersection of El-Beshbishi St. and Abu El-Kheir St. — Above Kazyon Market"}</span>
               </div>
             </div>
 

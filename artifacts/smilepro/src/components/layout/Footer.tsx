@@ -24,15 +24,19 @@ export function Footer() {
                 : "Specialized dental & oral surgery clinic — Dr. Ahmed Tarek, New Damietta."}
             </p>
             <div className="flex gap-3 pt-2">
-              <a href="https://www.facebook.com/Smilepro.DC" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.facebook.com/Smilepro.DC" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"
                 className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#1877F2] hover:border-[#1877F2] transition-colors">
                 <FaFacebook className="h-4 w-4" />
               </a>
-              <a href="https://www.instagram.com/dent_ahmed_tarek/" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.instagram.com/dent_ahmed_tarek/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"
                 className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#E1306C] hover:border-[#E1306C] transition-colors">
                 <FaInstagram className="h-4 w-4" />
               </a>
-              <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer"
+              <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01095530001" title="WhatsApp 01095530001"
+                className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-colors">
+                <FaWhatsapp className="h-4 w-4" />
+              </a>
+              <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp 01067678454" title="WhatsApp 01067678454"
                 className="size-9 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-colors">
                 <FaWhatsapp className="h-4 w-4" />
               </a>
@@ -57,13 +61,19 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground">{t("footer.contact")}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
+              <li className="flex items-start gap-2">
                 <Phone className="h-4 w-4 shrink-0 text-primary" />
-                <a href="tel:+201095530001" dir="ltr" className="hover:text-primary transition-colors">01095530001</a>
+                <div dir="ltr" className="flex flex-col">
+                  <a href="tel:+201095530001" className="hover:text-primary transition-colors">01095530001</a>
+                  <a href="tel:+201067678454" className="hover:text-primary transition-colors">01067678454</a>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-start gap-2">
                 <FaWhatsapp className="h-4 w-4 shrink-0 text-[#25D366]" />
-                <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" dir="ltr" className="hover:text-primary transition-colors">01095530001</a>
+                <div dir="ltr" className="flex flex-col">
+                  <a href="https://wa.me/201095530001" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">01095530001</a>
+                  <a href="https://wa.me/201067678454" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">01067678454</a>
+                </div>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
@@ -79,8 +89,8 @@ export function Footer() {
               <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-primary" />
               <address className="not-italic leading-relaxed">
                 {lang === "ar"
-                  ? <>دمياط الجديدة<br />إمتداد شارع الصحبجية<br />أمام مسجد النور<br />أعلي إسلامكو للكهربائيات</>
-                  : <>New Damietta<br />Al-Sahbajeya St. Extension<br />In front of Al-Nour Mosque<br />Above Islamco Electronics</>
+                  ? <>دمياط الجديدة<br />تقاطع شارع البشبيشي مع شارع ابو الخير<br />أعلى ماركت كازيون</>
+                  : <>New Damietta<br />Intersection of El-Beshbishi St. and Abu El-Kheir St.<br />Above Kazyon Market</>
                 }
               </address>
             </div>
