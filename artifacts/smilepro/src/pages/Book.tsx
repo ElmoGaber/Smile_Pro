@@ -31,6 +31,23 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface ServiceOption {
+  id: number;
+  nameEn: string;
+  nameAr: string;
+}
+
+const FALLBACK_SERVICES: ServiceOption[] = [
+  { id: 1, nameEn: "Teeth Whitening", nameAr: "تبييض الأسنان" },
+  { id: 2, nameEn: "Dental Implants", nameAr: "زراعة الأسنان" },
+  { id: 3, nameEn: "Orthodontics & Braces", nameAr: "تقويم الأسنان" },
+  { id: 4, nameEn: "Dental Veneers", nameAr: "قشور الأسنان" },
+  { id: 5, nameEn: "Root Canal Treatment", nameAr: "علاج العصب" },
+  { id: 6, nameEn: "Teeth Cleaning & Scaling", nameAr: "تنظيف وتلميع الأسنان" },
+  { id: 7, nameEn: "Dental X-Ray & Diagnostics", nameAr: "الأشعة التشخيصية" },
+  { id: 8, nameEn: "General Dentistry", nameAr: "طب الأسنان العام" },
+];
+
 const TIME_SLOTS = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", 
   "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM",
@@ -43,7 +60,17 @@ export default function Book() {
   const { toast } = useToast();
   const { data: services } = useListServices();
   const createAppointment = useCreateAppointment();
-  const safeServices = Array.isArray(services) ? services : [];
+  const safeServices: ServiceOption[] =
+    Array.isArray(services) && services.length > 0
+      ? services.filter(
+          (item): item is ServiceOption =>
+            Boolean(item) &&
+            typeof item === "object" &&
+            typeof (item as ServiceOption).id === "number" &&
+            typeof (item as ServiceOption).nameEn === "string" &&
+            typeof (item as ServiceOption).nameAr === "string",
+        )
+      : FALLBACK_SERVICES;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

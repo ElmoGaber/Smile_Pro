@@ -1,7 +1,27 @@
 import { Router } from "express";
-import { openai } from "@workspace/integrations-openai-ai-server";
 
 const router = Router();
+
+let openaiClientPromise: Promise<unknown> | null = null;
+
+async function getOpenAIClient() {
+  if (!openaiClientPromise) {
+    openaiClientPromise = import("@workspace/integrations-openai-ai-server")
+      .then((mod) => mod.openai)
+      .catch(() => null);
+  }
+
+  const client = await openaiClientPromise;
+  return client as
+    | {
+        chat: {
+          completions: {
+            create: (args: unknown) => Promise<AsyncIterable<unknown>>;
+          };
+        };
+      }
+    | null;
+}
 
 const SYSTEM_PROMPT = `أنت مساعد ذكاء اصطناعي متخصص في عيادة سمايل برو لطب الأسنان في دمياط الجديدة، مصر. 
 طبيب العيادة هو دكتور أحمد طارق، أخصائي طب وجراحة الأسنان والفم.
@@ -57,6 +77,14 @@ router.post("/", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+
+    const openai = await getOpenAIClient();
+    if (!openai) {
+      res.write(`data: ${JSON.stringify({ error: "AI service unavailable" })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+      return;
+    }
 
     const chatMessages = [
       { role: "system" as const, content: SYSTEM_PROMPT },

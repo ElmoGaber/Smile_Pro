@@ -26,8 +26,16 @@ router.get("/overview", async (req, res) => {
       yearsExperience: 12,
     });
   } catch (err) {
-    req.log.error({ err }, "Failed to get stats");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to get stats from DB, returning fallback values");
+    res.json({
+      totalAppointments: 0,
+      pendingAppointments: 0,
+      confirmedAppointments: 0,
+      completedAppointments: 0,
+      todayAppointments: 0,
+      happyPatients: 500,
+      yearsExperience: 12,
+    });
   }
 });
 

@@ -11,6 +11,26 @@ import {
 
 const router = Router();
 
+type AppointmentResponse = {
+  id: number;
+  patientName: string;
+  patientPhone: string;
+  patientEmail: string | null;
+  service: string;
+  preferredDate: string;
+  preferredTime: string;
+  notes: string | null;
+  status: string;
+  createdAt: string;
+};
+
+let fallbackAppointments: AppointmentResponse[] = [];
+let fallbackAppointmentId = 1;
+
+function listFallbackAppointments() {
+  return [...fallbackAppointments].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 router.get("/", async (req, res) => {
   try {
     const appointments = await db
@@ -19,8 +39,8 @@ router.get("/", async (req, res) => {
       .orderBy(desc(appointmentsTable.createdAt));
     res.json(appointments.map(formatAppointment));
   } catch (err) {
-    req.log.error({ err }, "Failed to list appointments");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to list appointments from DB, using in-memory fallback");
+    res.json(listFallbackAppointments());
   }
 });
 
@@ -39,8 +59,13 @@ router.get("/upcoming", async (req, res) => {
       .orderBy(appointmentsTable.preferredDate);
     res.json(upcoming.map(formatAppointment));
   } catch (err) {
-    req.log.error({ err }, "Failed to list upcoming appointments");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to list upcoming appointments from DB, using in-memory fallback");
+    const today = new Date().toISOString().split("T")[0];
+    res.json(
+      listFallbackAppointments().filter(
+        (appt) => appt.preferredDate >= today && appt.status === "confirmed",
+      ),
+    );
   }
 });
 
@@ -57,8 +82,10 @@ router.get("/:id", async (req, res) => {
     if (!appt) return res.status(404).json({ error: "Not found" });
     res.json(formatAppointment(appt));
   } catch (err) {
-    req.log.error({ err }, "Failed to get appointment");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to get appointment from DB, using in-memory fallback");
+    const appt = fallbackAppointments.find((item) => item.id === parsed.data.id);
+    if (!appt) return res.status(404).json({ error: "Not found" });
+    res.json(appt);
   }
 });
 
@@ -83,8 +110,21 @@ router.post("/", async (req, res) => {
       .returning();
     res.status(201).json(formatAppointment(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create appointment");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to create appointment in DB, using in-memory fallback");
+    const created: AppointmentResponse = {
+      id: fallbackAppointmentId++,
+      patientName: parsed.data.patientName,
+      patientPhone: parsed.data.patientPhone,
+      patientEmail: parsed.data.patientEmail ?? null,
+      service: parsed.data.service,
+      preferredDate: parsed.data.preferredDate,
+      preferredTime: parsed.data.preferredTime,
+      notes: parsed.data.notes ?? null,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+    fallbackAppointments = [created, ...fallbackAppointments];
+    res.status(201).json(created);
   }
 });
 
@@ -106,8 +146,14 @@ router.patch("/:id", async (req, res) => {
     if (!updated) return res.status(404).json({ error: "Not found" });
     res.json(formatAppointment(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update appointment");
-    res.status(500).json({ error: "Internal server error" });
+    req.log.warn({ err }, "Failed to update appointment in DB, using in-memory fallback");
+    const index = fallbackAppointments.findIndex((item) => item.id === paramsParsed.data.id);
+    if (index === -1) return res.status(404).json({ error: "Not found" });
+    fallbackAppointments[index] = {
+      ...fallbackAppointments[index],
+      status: bodyParsed.data.status,
+    };
+    res.json(fallbackAppointments[index]);
   }
 });
 

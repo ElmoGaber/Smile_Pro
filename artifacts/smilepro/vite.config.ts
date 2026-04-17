@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT ?? "3000";
+const rawPort = process.env.PORT ?? "8080";
 
 const port = Number(rawPort);
 
@@ -12,8 +12,8 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH ?? "/Smile_Pro/";
-const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:3000";
+const basePath = process.env.BASE_PATH ?? (process.env.NODE_ENV === "production" ? "/Smile_Pro/" : "/");
+const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:8081";
 
 export default defineConfig({
   base: basePath,
